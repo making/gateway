@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringCloudGatewayKubernetesApplication {
+public class KubernetesSpringCloudGatewayApplication {
 
 	public static void main(String[] args) {
 		System.setProperty("reactor.netty.http.server.accessLogEnabled", "true");
-		SpringApplication.run(SpringCloudGatewayKubernetesApplication.class, args);
+		SpringApplication.run(KubernetesSpringCloudGatewayApplication.class, args);
 	}
 }
