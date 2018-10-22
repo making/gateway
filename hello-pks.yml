@@ -78,7 +78,10 @@ metadata:
       predicates:
       - Host=hello-pks.dev.bosh.tokyo
       filters:
-      - Hystrix=hello/hello-pks
+      - name: Hystrix
+        args:
+          name: hello-pks
+          fallbackUri: forward:/error/503
       - PreserveHostHeader
       - SecureHeaders
       - name: Retry
