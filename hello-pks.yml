@@ -9,7 +9,7 @@ metadata:
   name: hello-pks
   namespace: hello
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: hello-pks
@@ -23,32 +23,69 @@ spec:
         name: hello-pks
         ports:
         - containerPort: 8080
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        resources:
+          limits:
+            memory: "386Mi"
+          requests:
+            memory: "386Mi"
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 15
+          timeoutSeconds: 3
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 180
+          timeoutSeconds: 3
+          periodSeconds: 10
+          failureThreshold: 3
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: hello-pks-service
+  name: hello-pks
   namespace: hello
   labels:
     app: hello-pks
   annotations:
-    spring.cloud.gateway/port: http
     spring.cloud.gateway/routes: |
-      order: 3
       predicates:
-      - Host=hello-pks.k8s.bosh.tokyo
+      - Host=hello-pks.dev.bosh.tokyo
       filters:
-      #- AddRequestHeader=X-Request-Foo, Bar
-      #- AddRequestParameter=foo, bar
+      - Hystrix=hello/hello-pks
+      - PreserveHostHeader
+      - SecureHeaders
       - name: Retry
         args:
           retries: 3
           statuses: BAD_GATEWAY
-      - name: RequestSize
-        args:
-          maxSize: 5000000
 spec:
-  type: NodePort
   selector:
     app: hello-pks
   ports:

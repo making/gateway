@@ -3,9 +3,7 @@ package am.ik.k8s;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -16,6 +14,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watcher;
@@ -68,37 +67,48 @@ public class KubernetesRouteDefinitionLocator
 			if (action == Action.ADDED || action == Action.MODIFIED) {
 				Map<String, String> annotations = metadata.getAnnotations();
 				if (annotations != null) {
-					if (!annotations.containsKey(KEY_PREFIX + "/port")) {
+					String routes = annotations.get(KEY_PREFIX + "/routes");
+					if (routes == null) {
 						return;
 					}
 					String portName = annotations.get(KEY_PREFIX + "/port");
-					Optional<ServicePort> sp = service.getSpec().getPorts().stream()
-							.filter(p -> Objects.equals(p.getName(), portName)).findAny();
+					ServiceSpec spec = service.getSpec();
+					List<ServicePort> ports = spec.getPorts();
+					String scheme = annotations.getOrDefault(KEY_PREFIX + "/scheme",
+							"http");
+					OptionalInt sp = determinePort(portName, ports);
 					if (sp.isPresent()) {
-						ServicePort servicePort = sp.get();
-						String routes = annotations.get(KEY_PREFIX + "/routes");
+						int port = sp.getAsInt();
 						RouteDefinition routeDefinition = this.objectMapper
 								.readValue(routes, RouteDefinition.class);
 						routeDefinition.setId(id);
 						if (routeDefinition.getUri() == null) {
-							String host = metadata.getName() + "."
-									+ metadata.getNamespace() + ".svc.cluster.local";
-							URI uri = UriComponentsBuilder.newInstance().scheme("http")
-									.host(host).port(servicePort.getPort()).build()
-									.toUri();
+							boolean useClusterIp = Boolean.parseBoolean(
+									annotations.get(KEY_PREFIX + "/useClusterIP"));
+							String host = useClusterIp ? spec.getClusterIP()
+									: metadata.getName() + "." + metadata.getNamespace()
+											+ ".svc.cluster.local";
+							URI uri = UriComponentsBuilder.newInstance() //
+									.scheme(scheme) //
+									.host(host) //
+									.port(port) //
+									.build().toUri();
 							routeDefinition.setUri(uri);
 						}
 						String yaml = this.objectMapper
 								.writeValueAsString(routeDefinition);
-						log.info("Update {}\t{}", service.getMetadata().getName(), yaml);
+						log.info("Update {}\t{}", id, yaml);
 						this.routeDefinitions.put(routeDefinition.getId(),
 								routeDefinition);
 						this.eventPublisher.publishEvent(new RefreshRoutesEvent(this));
 					}
+					else {
+						log.warn("Could not determine port => {}", id);
+					}
 				}
 			}
 			else if (action == Action.DELETED) {
-				log.info("Delete {}\t{}", service.getMetadata().getName(), id);
+				log.info("Delete {}", id);
 				this.routeDefinitions.remove(id);
 				this.eventPublisher.publishEvent(new RefreshRoutesEvent(this));
 			}
@@ -106,6 +116,18 @@ public class KubernetesRouteDefinitionLocator
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	static OptionalInt determinePort(String portName, List<ServicePort> ports) {
+		Optional<ServicePort> sp = ports.stream()
+				.filter(p -> Objects.equals(p.getName(), portName)).findAny();
+		if (sp.isPresent()) {
+			return OptionalInt.of(sp.get().getPort());
+		}
+		else if (ports.size() == 1) {
+			return OptionalInt.of(ports.get(0).getPort());
+		}
+		return OptionalInt.empty();
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KubernetesConfig {
 
-	@Bean(destroyMethod = "close")
+	@Bean
 	public KubernetesClient kubernetesClient() {
 		Config config = new ConfigBuilder().build();
 		return new DefaultKubernetesClient(config);
