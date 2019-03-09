@@ -13,7 +13,6 @@ import org.springframework.web.server.WebFilterChain;
 public class KubernetesSpringCloudGatewayApplication {
 
 	public static void main(String[] args) {
-		System.setProperty("reactor.netty.http.server.accessLogEnabled", "true");
 		SpringApplication.run(KubernetesSpringCloudGatewayApplication.class, args);
 	}
 
