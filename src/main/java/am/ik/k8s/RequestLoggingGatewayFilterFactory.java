@@ -16,6 +16,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
+import static org.springframework.http.HttpHeaders.REFERER;
+
 @Component
 public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFactory {
 	private final Logger log = LoggerFactory.getLogger("RTR");
@@ -38,13 +40,14 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
 						String host = headers.getHost().getHostString();
 						String address = request.getRemoteAddress().getHostString();
 						String userAgent = headers.getFirst(HttpHeaders.USER_AGENT);
+						String referer = headers.getFirst(REFERER);
 						boolean crawler = userAgent == null
 								|| userAgent.toLowerCase().contains("bot")
 								|| Classifier.isCrawler(userAgent);
 						log.info(
-								"date:{}\tmethod:{}\tpath:{}\tstatus:{}\thost:{}\taddress:{}\tresponse_time:{}ms\tcrawler:{}\tuser-agent:{}",
+								"date:{}\tmethod:{}\tpath:{}\tstatus:{}\thost:{}\taddress:{}\tresponse_time:{}ms\tcrawler:{}\tuser-agent:{}\treferer:{}",
 								now, method, path, statusCode, host, address, elapsed,
-								crawler, userAgent);
+								crawler, userAgent, referer);
 					});
 		};
 	}
