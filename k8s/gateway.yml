@@ -1,13 +1,14 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: spring-cloud-gateway
+  name: gateway
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: spring-cloud-gateway
-  namespace: spring-cloud-gateway
+  namespace: gateway
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -34,13 +35,13 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: spring-cloud-gateway
-  namespace: spring-cloud-gateway
+  namespace: gateway
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: spring-cloud-gateway
-  namespace: spring-cloud-gateway
+  namespace: gateway
 spec:
   replicas: 2
   selector:
@@ -53,28 +54,45 @@ spec:
     spec:
       serviceAccountName: spring-cloud-gateway
       containers:
-      - image: making/kubernetes-spring-cloud-gateway
+      - image: making/kubernetes-spring-cloud-gateway@sha256:c7e573c58477a4448cb4a6f3e9ef670143e7ee07937e4cd57bd7922cf47b725d
         name: spring-cloud-gateway
         ports:
         - containerPort: 8080
-        env: []
+        env:
+        - name: SPRING_ZIPKIN_BASE_URL
+          value: https://zipkin.dev.ik.am
+        - name: SPRING_SLEUTH_WEB_ADDITIONAL_SKIP_PATTERN
+          value: "/management.*"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: "/management"
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka.dev.ik.am:17440"
+        - name: SPRING_KAFKA_TEMPLATE_DEFAULT_TOPIC
+          value: "request-log"
+        - name: LOGGING_EXCEPTION_CONVERSION_WORD
+          value: "\t%replace(%replace(%xEx){'\n','@n@'}){'\t','    '}%nopex"
+        - name: LOGGING_PATTERN_CONSOLE
+          value: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${logging.pattern.level:%5p}) %clr(${PID: }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %replace(%m){'\n','@n@'}${logging.exception-conversion-word:%wEx}%n"
+
         resources:
           limits:
-            memory: "386Mi"
+            memory: "300Mi"
           requests:
-            memory: "386Mi"
+            memory: "300Mi"
         readinessProbe:
           httpGet:
-            path: /actuator/health
+            path: /management/health
             port: 8080
+            scheme: HTTPS
           initialDelaySeconds: 15
           timeoutSeconds: 3
           periodSeconds: 10
           failureThreshold: 3
         livenessProbe:
           httpGet:
-            path: /actuator/health
+            path: /management/health
             port: 8080
+            scheme: HTTPS
           initialDelaySeconds: 180
           timeoutSeconds: 3
           periodSeconds: 10
@@ -84,7 +102,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: spring-cloud-gateway
-  namespace: spring-cloud-gateway
+  namespace: gateway
   labels:
     app: spring-cloud-gateway
 spec:
@@ -95,4 +113,15 @@ spec:
   - protocol: TCP
     port: 8080
     nodePort: 32765
-    name: http
+    name: https
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: spring-cloud-gateway
+  namespace: gateway
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: spring-cloud-gateway
