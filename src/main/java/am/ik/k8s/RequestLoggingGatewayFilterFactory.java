@@ -1,10 +1,13 @@
 package am.ik.k8s;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Objects;
 
 import is.tagomor.woothee.Classifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.RequestPath;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.http.HttpHeaders.REFERER;
@@ -21,6 +25,12 @@ import static org.springframework.http.HttpHeaders.REFERER;
 @Component
 public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFactory {
 	private final Logger log = LoggerFactory.getLogger("RTR");
+	private final KafkaTemplate<String, RequestLog> kafkaTemplate;
+
+	public RequestLoggingGatewayFilterFactory(
+			KafkaTemplate<String, RequestLog> kafkaTemplate) {
+		this.kafkaTemplate = kafkaTemplate;
+	}
 
 	@Override
 	public GatewayFilter apply(Object config) {
@@ -31,7 +41,7 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
 						long elapsed = (System.nanoTime() - begin) / 1_000_000;
 						ServerHttpRequest request = exchange.getRequest();
 						ServerHttpResponse response = exchange.getResponse();
-						LocalDateTime now = LocalDateTime.now();
+						OffsetDateTime now = OffsetDateTime.now();
 						HttpMethod method = request.getMethod();
 						RequestPath path = request.getPath();
 						HttpStatus code = response.getStatusCode();
@@ -44,10 +54,20 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
 						boolean crawler = userAgent == null
 								|| userAgent.toLowerCase().contains("bot")
 								|| Classifier.isCrawler(userAgent);
-						log.info(
-								"date:{}\tmethod:{}\tpath:{}\tstatus:{}\thost:{}\taddress:{}\tresponse_time:{}ms\tcrawler:{}\tuser-agent:{}\treferer:{}",
-								now, method, path, statusCode, host, address, elapsed,
-								crawler, userAgent, referer);
+						RequestLog requestLog = new RequestLogBuilder()
+								.setDate(now.toString())
+								.setMethod(Objects.toString(method, ""))
+								.setPath(path.value()).setStatus(statusCode).setHost(host)
+								.setAddress(address).setElapsed(elapsed)
+								.setUserAgent(userAgent).setReferer(referer)
+								.setCrawler(crawler).createRequestLog();
+						log.info("{}", requestLog);
+						Mono.defer(() -> Mono.fromFuture(this.kafkaTemplate
+								.send(this.kafkaTemplate.getDefaultTopic(),
+										requestLog.getAddress(), requestLog)
+								.completable())) //
+								.subscribeOn(Schedulers.parallel()) //
+								.subscribe();
 					});
 		};
 	}
