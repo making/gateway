@@ -1,4 +1,4 @@
-package am.ik.k8s;
+package am.ik.k8s.locator;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

@@ -1,4 +1,4 @@
-package am.ik.k8s;
+package am.ik.k8s.config;
 
 import io.micrometer.core.instrument.config.MeterFilter;
 

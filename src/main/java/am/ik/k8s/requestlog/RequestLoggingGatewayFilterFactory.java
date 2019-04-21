@@ -1,4 +1,4 @@
-package am.ik.k8s;
+package am.ik.k8s.requestlog;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;

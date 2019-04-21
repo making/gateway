@@ -1,4 +1,4 @@
-package am.ik.k8s;
+package am.ik.k8s.config;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package am.ik.k8s;
+package am.ik.k8s.requestlog;
 
 public class RequestLog {
 	private String date;

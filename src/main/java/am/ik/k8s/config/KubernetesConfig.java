@@ -1,4 +1,4 @@
-package am.ik.k8s;
+package am.ik.k8s.config;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
