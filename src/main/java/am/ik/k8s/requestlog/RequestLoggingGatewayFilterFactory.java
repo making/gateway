@@ -51,23 +51,26 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
 						String address = request.getRemoteAddress().getHostString();
 						String userAgent = headers.getFirst(HttpHeaders.USER_AGENT);
 						String referer = headers.getFirst(REFERER);
-						boolean crawler = userAgent == null
-								|| userAgent.toLowerCase().contains("bot")
-								|| Classifier.isCrawler(userAgent);
-						RequestLog requestLog = new RequestLogBuilder()
-								.setDate(now.toString())
-								.setMethod(Objects.toString(method, ""))
-								.setPath(path.value()).setStatus(statusCode).setHost(host)
-								.setAddress(address).setElapsed(elapsed)
-								.setUserAgent(userAgent).setReferer(referer)
-								.setCrawler(crawler).createRequestLog();
-						log.info("{}", requestLog);
-						Mono.defer(() -> Mono.fromFuture(this.kafkaTemplate
-								.send(this.kafkaTemplate.getDefaultTopic(),
-										requestLog.getAddress(), requestLog)
-								.completable())) //
-								.subscribeOn(Schedulers.parallel()) //
-								.subscribe();
+						if (!"Go-http-client/1.1".equals(userAgent)) {
+							// Ignore requests from blackbox exporter
+							boolean crawler = userAgent == null
+									|| userAgent.toLowerCase().contains("bot")
+									|| Classifier.isCrawler(userAgent);
+							RequestLog requestLog = new RequestLogBuilder()
+									.setDate(now.toString())
+									.setMethod(Objects.toString(method, ""))
+									.setPath(path.value()).setStatus(statusCode)
+									.setHost(host).setAddress(address).setElapsed(elapsed)
+									.setUserAgent(userAgent).setReferer(referer)
+									.setCrawler(crawler).createRequestLog();
+							log.info("{}", requestLog);
+							Mono.defer(() -> Mono.fromFuture(this.kafkaTemplate
+									.send(this.kafkaTemplate.getDefaultTopic(),
+											requestLog.getAddress(), requestLog)
+									.completable())) //
+									.subscribeOn(Schedulers.parallel()) //
+									.subscribe();
+						}
 					});
 		};
 	}
