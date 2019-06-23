@@ -54,11 +54,13 @@ spec:
     spec:
       serviceAccountName: spring-cloud-gateway
       containers:
-      - image: making/kubernetes-spring-cloud-gateway@sha256:c6af42b178c7115d04400c30432e41d72d2b48866b3a1836f813ec92c2d4fa37
+      - image: making/kubernetes-spring-cloud-gateway@sha256:c61e7de07930fddf0b3e9c791243abba9413f74885b944b9aae2adacd8bbe310
         name: spring-cloud-gateway
         ports:
         - containerPort: 8080
         env:
+        - name: SPRING_SLEUTH_SAMPLER_RATE
+          value: "30"
         - name: SPRING_ZIPKIN_BASE_URL
           value: https://zipkin.dev.ik.am
         - name: SPRING_SLEUTH_WEB_ADDITIONAL_SKIP_PATTERN
@@ -66,7 +68,7 @@ spec:
         - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
           value: "/management"
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
-          value: "kafka.dev.ik.am:17440"
+          value: "kafka.dev.ik.am:17505"
         - name: SPRING_KAFKA_TEMPLATE_DEFAULT_TOPIC
           value: "request-log"
         - name: LOGGING_EXCEPTION_CONVERSION_WORD
@@ -76,7 +78,7 @@ spec:
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__ID
           value: concourse
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__URI
-          value: https://ngrok.dev.ik.am:14161
+          value: https://ngrok.dev.ik.am:17457
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0__NAME
           value: Host
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0__ARGS_PATTERNS
