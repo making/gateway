@@ -54,7 +54,7 @@ spec:
     spec:
       serviceAccountName: spring-cloud-gateway
       containers:
-      - image: making/kubernetes-spring-cloud-gateway@sha256:c70b368968c11c1e275429cd36e43f455e15b7c168a7493b97ca9849302439f6
+      - image: making/kubernetes-spring-cloud-gateway@sha256:ed94696a01753d92c9871220ab179336c552a8ed6e2fcfe3036f393eac92818d
         name: spring-cloud-gateway
         ports:
         - containerPort: 8080
