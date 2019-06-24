@@ -54,7 +54,7 @@ spec:
     spec:
       serviceAccountName: spring-cloud-gateway
       containers:
-      - image: making/kubernetes-spring-cloud-gateway@sha256:c61e7de07930fddf0b3e9c791243abba9413f74885b944b9aae2adacd8bbe310
+      - image: making/kubernetes-spring-cloud-gateway@sha256:c70b368968c11c1e275429cd36e43f455e15b7c168a7493b97ca9849302439f6
         name: spring-cloud-gateway
         ports:
         - containerPort: 8080
@@ -75,6 +75,7 @@ spec:
           value: "\t%replace(%replace(%xEx){'\n','@n@'}){'\t','    '}%nopex"
         - name: LOGGING_PATTERN_CONSOLE
           value: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${logging.pattern.level:%5p}) %clr(${PID: }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %replace(%m){'\n','@n@'}${logging.exception-conversion-word:%wEx}%n"
+        # Concourse
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__ID
           value: concourse
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__URI
@@ -86,6 +87,19 @@ spec:
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__FILTERS_0__NAME
           value: PreserveHostHeader
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__FILTERS_1__NAME
+          value: RequestLogging
+        # Vault
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__ID
+          value: vault
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__URI
+          value: http://10.0.8.4:8200
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0__NAME
+          value: Host
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0__ARGS_PATTERNS
+          value: vault.dev.bosh.tokyo
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_0__NAME
+          value: PreserveHostHeader
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_1__NAME
           value: RequestLogging
         resources:
           limits:
