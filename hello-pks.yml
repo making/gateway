@@ -9,7 +9,7 @@ metadata:
   name: hello-pks
   namespace: hello
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: hello-pks
@@ -73,21 +73,6 @@ metadata:
   namespace: hello
   labels:
     app: hello-pks
-  annotations:
-    spring.cloud.gateway/routes: |
-      predicates:
-      - Host=hello-pks.dev.bosh.tokyo
-      filters:
-      - name: Hystrix
-        args:
-          name: hello-pks
-          fallbackUri: forward:/error/503
-      - PreserveHostHeader
-      - SecureHeaders
-      - name: Retry
-        args:
-          retries: 3
-          statuses: BAD_GATEWAY
 spec:
   selector:
     app: hello-pks
@@ -95,3 +80,19 @@ spec:
   - protocol: TCP
     port: 8080
     name: http
+---
+apiVersion: gateway.ik.am/v1beta1
+kind: RouteDefinition
+metadata:
+  name: hello-pks
+  namespace: hello
+spec:
+  route:
+    predicates:
+    - Host=hello-pks.example.com
+    filters:
+    - Hystrix=hello/hello-pks
+    - name: Retry
+      args:
+        retries: 3
+        statuses: BAD_GATEWAY

@@ -75,4 +75,20 @@ spec:
         name: hello-pks
         ports:
         - containerPort: 8080
+---
+apiVersion: gateway.ik.am/v1beta1
+kind: RouteDefinition
+metadata:
+  name: hello-pks
+  namespace: hello
+spec:
+  route:
+    predicates:
+    - Host=hello-pks.example.com
+    filters:
+    - Hystrix=hello/hello-pks
+    - name: Retry
+      args:
+        retries: 3
+        statuses: BAD_GATEWAY
 ```
