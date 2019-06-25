@@ -16,7 +16,7 @@ metadata:
   name: spring-cloud-gateway
 rules:
 - apiGroups:
-  - gateway.ik.am
+  - gateway.cloud.ik.am
   resources:
   - routedefinitions
   verbs:
@@ -49,65 +49,6 @@ subjects:
   name: spring-cloud-gateway
   namespace: gateway
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: routedefinitions.gateway.ik.am
-spec:
-  group: gateway.ik.am
-  version: v1beta1
-  scope: Namespaced
-  names:
-    plural: routedefinitions
-    singular: routedefinition
-    kind: RouteDefinition
-    shortNames:
-      - rd
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          properties:
-            serviceName:
-              type: string
-            portName:
-              type: string
-            route:
-              properties:
-                uri:
-                  type: string
-                predicates:
-                  type: array
-                filters:
-                  type: array
-              required:
-                - predicates
-            scheme:
-              enum:
-                - http
-                - https
-              type: string
-            useClusterIp:
-              type: boolean
-          required:
-            - route
-  additionalPrinterColumns:
-    - JSONPath: .spec.serviceName
-      name: ServiceName
-      type: string
-    - JSONPath: .spec.scheme
-      name: Scheme
-      type: string
-    - JSONPath: .spec.portName
-      name: PortName
-      type: string
-    - JSONPath: .spec.useClusterIp
-      name: UseClusterIp
-      type: boolean
-    - JSONPath: .spec.route
-      name: Route
-      type: string
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -125,7 +66,7 @@ spec:
     spec:
       serviceAccountName: spring-cloud-gateway
       containers:
-      - image: making/kubernetes-spring-cloud-gateway@sha256:aa87252098158fffbefb800638c96c59d2016d04db0d28bb57660ffdbeb75cdb
+      - image: making/kubernetes-spring-cloud-gateway@sha256:b61a7e4e72e0349fc09a563bf3d1108ede8d7f467ace2d2e6c76418d8fc345e9
         name: spring-cloud-gateway
         ports:
         - containerPort: 8080
