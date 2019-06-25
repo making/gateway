@@ -37,16 +37,6 @@ metadata:
   namespace: hello
   labels:
     app: hello-pks
-  annotations:
-    spring.cloud.gateway/routes: |
-      predicates:
-      - Host=hello-pks.example.com
-      filters:
-      - Hystrix=hello/hello-pks
-      - name: Retry
-        args:
-          retries: 3
-          statuses: BAD_GATEWAY
 spec:
   selector:
     app: hello-pks
@@ -91,4 +81,20 @@ spec:
       args:
         retries: 3
         statuses: BAD_GATEWAY
+```
+
+You can also add a standalone route definition as follows:
+
+```yaml
+apiVersion: gateway.ik.am/v1beta1
+kind: RouteDefinition
+metadata:
+  name: httpbin
+spec:
+  route:
+    uri: https://httpbin.org
+    predicates:
+    - Path=/get,/ip
+    filters:
+    - PreserveHostHeader=
 ```
