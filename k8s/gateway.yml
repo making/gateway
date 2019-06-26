@@ -72,7 +72,7 @@ spec:
         - containerPort: 8080
         env:
         - name: SPRING_SLEUTH_SAMPLER_RATE
-          value: "30"
+          value: "32"
         - name: SPRING_ZIPKIN_BASE_URL
           value: https://zipkin.dev.ik.am
         - name: SPRING_SLEUTH_WEB_ADDITIONAL_SKIP_PATTERN
@@ -87,32 +87,6 @@ spec:
           value: "\t%replace(%replace(%xEx){'\n','@n@'}){'\t','    '}%nopex"
         - name: LOGGING_PATTERN_CONSOLE
           value: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${logging.pattern.level:%5p}) %clr(${PID: }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %replace(%m){'\n','@n@'}${logging.exception-conversion-word:%wEx}%n"
-        # Concourse
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__ID
-          value: concourse
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__URI
-          value: https://ngrok.dev.ik.am:17457
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0__NAME
-          value: Host
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0__ARGS_PATTERNS
-          value: concourse.ik.am
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__FILTERS_0__NAME
-          value: PreserveHostHeader
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__FILTERS_1__NAME
-          value: RequestLogging
-        # Vault
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__ID
-          value: vault
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__URI
-          value: http://10.0.8.4:8200
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0__NAME
-          value: Host
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0__ARGS_PATTERNS
-          value: vault.dev.bosh.tokyo
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_0__NAME
-          value: PreserveHostHeader
-        - name: SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_1__NAME
-          value: RequestLogging
         resources:
           limits:
             memory: "300Mi"
