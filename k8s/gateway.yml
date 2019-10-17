@@ -66,23 +66,19 @@ spec:
     spec:
       serviceAccountName: spring-cloud-gateway
       containers:
-      - image: making/kubernetes-spring-cloud-gateway@sha256:b61a7e4e72e0349fc09a563bf3d1108ede8d7f467ace2d2e6c76418d8fc345e9
+      - image: making/kubernetes-spring-cloud-gateway:latest
         name: spring-cloud-gateway
         ports:
         - containerPort: 8080
         env:
         - name: SPRING_SLEUTH_SAMPLER_RATE
-          value: "32"
+          value: "30"
         - name: SPRING_ZIPKIN_BASE_URL
-          value: https://zipkin.dev.ik.am
+          value: http://10.0.8.4:9411
         - name: SPRING_SLEUTH_WEB_ADDITIONAL_SKIP_PATTERN
-          value: "/management.*"
+          value: "/management.*,/actuator.*"
         - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
           value: "/management"
-        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
-          value: "kafka.dev.ik.am:17505"
-        - name: SPRING_KAFKA_TEMPLATE_DEFAULT_TOPIC
-          value: "request-log"
         - name: LOGGING_EXCEPTION_CONVERSION_WORD
           value: "\t%replace(%replace(%xEx){'\n','@n@'}){'\t','    '}%nopex"
         - name: LOGGING_PATTERN_CONSOLE
