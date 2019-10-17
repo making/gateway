@@ -1,4 +1,4 @@
-package am.ik.blog.config;
+package am.ik.k8s.config;
 
 import reactor.netty.http.client.HttpClient;
 
