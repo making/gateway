@@ -27,9 +27,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>am.ik.cloud.gateway</groupId>
+            <groupId>com.github.making</groupId>
             <artifactId>kubernetes-route-definition-locator</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>master-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -110,6 +110,10 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
