@@ -1,3 +1,3 @@
 #!/bin/bash
 
-kapp deploy -a gateway -f k8s -c
+kapp deploy -a gateway -f <(kbld -f k8s) -c
