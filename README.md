@@ -13,7 +13,7 @@ kubectl apply -f k8s/gateway.yml
 
 ```
 mkdir serviceaccount
-kubectl -n spring-cloud-gateway get secrets $(kubectl -n spring-cloud-gateway get serviceaccount spring-cloud-gateway -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode > serviceaccount/token 
+kubectl -n gateway get secrets $(kubectl -n gateway get serviceaccount spring-cloud-gateway -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode > serviceaccount/token 
 docker run --rm -p 8080:8080 \
   --memory=384m \
   -v $(pwd)/serviceaccount:/var/run/secrets/kubernetes.io/serviceaccount \
