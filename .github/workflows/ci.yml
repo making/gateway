@@ -50,7 +50,7 @@ jobs:
       if: github.ref == 'refs/heads/master'
       env:
         KBLD_VERSION: 0.13.0
-        WAIT_UNTIL_READY_SELECTOR: app=blog-frontend
+        WAIT_UNTIL_READY_SELECTOR: app=spring-cloud-gateway
       run: |
         set -e
         wget -q https://github.com/k14s/kbld/releases/download/v${KBLD_VERSION}/kbld-linux-amd64 -O kbld
