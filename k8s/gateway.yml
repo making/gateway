@@ -78,7 +78,7 @@ spec:
         - name: BPL_THREAD_COUNT
           value: "36"
         - name: JAVA_OPTS
-          value: "-XX:ReservedCodeCacheSize=32M -Xss512k -XX:+PrintCodeCache"
+          value: " -XX:ReservedCodeCacheSize=32M -Xss512k -XX:+PrintCodeCache"
         - name: SPRING_SLEUTH_SAMPLER_RATE
           value: "30"
         - name: SPRING_ZIPKIN_BASE_URL
@@ -93,6 +93,24 @@ spec:
           value: "\t%replace(%replace(%xEx){'\n','@n@'}){'\t','    '}%nopex"
         - name: LOGGING_PATTERN_CONSOLE
           value: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${logging.pattern.level:%5p}) %clr(${PID: }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %replace(%m){'\n','@n@'}${logging.exception-conversion-word:%wEx}%n"
+        - name: INFO_K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: INFO_K8S_POD
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: INFO_K8S_APP
+          value: "${spring.application.name}"
+        - name: MANAGEMENT_METRICS_TAGS_ORGANIZATION
+          value: cfcr-aws
+        - name: MANAGEMENT_METRICS_TAGS_SPACE
+          value: "${INFO_K8S_NAMESPACE}"
+        - name: MANAGEMENT_METRICS_TAGS_APPLICATION
+          value: "${INFO_K8S_APP}"
+        - name: MANAGEMENT_METRICS_TAGS_INSTANCE_ID
+          value: "${INFO_K8S_POD}"          
         resources:
           limits:
             memory: "300Mi"
