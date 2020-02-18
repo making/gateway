@@ -75,6 +75,8 @@ spec:
           value: "8080"
         - name: SPRING_PROFILES_ACTIVE
           value: kubernetes
+        - name: SPRING_CLOUD_GATEWAY_HTTPCLIENT_SSL_USEINSECURETRUSTMANAGER
+          value: "true"          
         - name: BPL_THREAD_COUNT
           value: "36"
         - name: JAVA_OPTS
