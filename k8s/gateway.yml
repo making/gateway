@@ -87,6 +87,8 @@ spec:
           value: "/management.*,/actuator.*"
         - name: SPRING_SLEUTH_SCHEDULED_SKIP_PATTERN
           value: am.ik.cloud.gateway.locator.KubernetesRouteDefinitionLocator
+        - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST
+          value: prometheus-proxy.dev.bosh.tokyo
         - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
           value: "/management"
         - name: LOGGING_EXCEPTION_CONVERSION_WORD
