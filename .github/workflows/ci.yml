@@ -24,7 +24,8 @@ jobs:
       if: github.ref == 'refs/heads/master'
       run: |
         set -e
-        ./mvnw -V package -Dmaven.test.skip=true
+        BOOT_VERSION=$(grep '<version>' pom.xml | head -n 1 | sed -e 's|<version>||g' -e 's|</version>||g' -e 's|<.*>||g' -e 's| ||g')
+        ./mvnw -V package -Dmaven.test.skip=true -Dspring-boot.version=${BOOT_VERSION}
     - name: pack build
       if: github.ref == 'refs/heads/master'
       env:
