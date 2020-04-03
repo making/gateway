@@ -39,7 +39,7 @@ jobs:
         tar xzf pack-*.tgz
         rm -f pack-*.tgz
         ./pack build making/kubernetes-spring-cloud-gateway \
-          -p target/kubernetes-spring-cloud-gateway-*.jar  \
+          -p target/gateway-*.jar  \
           --builder cloudfoundry/cnb:bionic \
           --publish
     - uses: azure/k8s-set-context@v1
