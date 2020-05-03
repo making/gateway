@@ -40,7 +40,7 @@ jobs:
         rm -f pack-*.tgz
         ./pack build making/kubernetes-spring-cloud-gateway \
           -p target/gateway-*.jar  \
-          --builder cloudfoundry/cnb:bionic \
+          --builder gcr.io/paketo-buildpacks/builder:base \
           --publish
     - uses: azure/k8s-set-context@v1
       if: github.ref == 'refs/heads/master'
