@@ -47,11 +47,11 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
                         HttpHeaders headers = request.getHeaders();
                         String host = headers.getHost().getHostString();
                         String address = request.getRemoteAddress().getHostString();
-                        String userAgent = headers.getFirst(HttpHeaders.USER_AGENT);
+                        String userAgent = Objects.toString(headers.getFirst(HttpHeaders.USER_AGENT), "null");
                         String referer = headers.getFirst(REFERER);
-                        if (!"Go-http-client/1.1".equals(userAgent)) {
-                            // Ignore requests from blackbox exporter
-                            final String ua = userAgent == null ? "null" : userAgent.toLowerCase();
+                        if (!"Go-http-client/1.1".equals(userAgent) && !userAgent.startsWith("Prometheus")) {
+                            // Ignore requests from blackbox exporter and Prometheus
+                            final String ua = userAgent.toLowerCase();
                             boolean crawler = ua.contains("bot")
                                     || ua.contains("crawler")
                                     || Classifier.isCrawler(userAgent);
