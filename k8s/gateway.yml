@@ -76,7 +76,19 @@ spec:
         - name: SPRING_PROFILES_ACTIVE
           value: kubernetes
         - name: SPRING_CLOUD_GATEWAY_HTTPCLIENT_SSL_USEINSECURETRUSTMANAGER
-          value: "true"          
+          value: "true"
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__ID
+          value: banned
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__URI
+          value: https://httpbin.org
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__ORDER
+          value: "-300"
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0__NAME
+          value: BannedRequest
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0__ARGS_PATTERNS
+          value: "/wp-login.php"
+        - name: SPRING_CLOUD_GATEWAY_ROUTES_0__FILTERS_0__NAME
+          value: Teapot
         - name: BPL_THREAD_COUNT
           value: "36"
         - name: JAVA_OPTS
@@ -114,7 +126,7 @@ spec:
         - name: MANAGEMENT_METRICS_TAGS_APPLICATION
           value: "${INFO_K8S_APP}"
         - name: MANAGEMENT_METRICS_TAGS_INSTANCE_ID
-          value: "${INFO_K8S_POD}"          
+          value: "${INFO_K8S_POD}"
         resources:
           limits:
             memory: "300Mi"
