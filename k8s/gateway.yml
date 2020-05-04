@@ -98,7 +98,7 @@ spec:
         - name: SPRING_ZIPKIN_BASE_URL
           value: https://zipkin.apps.pcfone.io
         - name: SPRING_SLEUTH_WEB_ADDITIONAL_SKIP_PATTERN
-          value: "/actuator.*|/zipkin.*|/api/v2/spans"
+          value: "/actuator.*|/zipkin.*|/api/v2/spans|/metrics/.*"
         - name: MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST
           value: prometheus-proxy.dev.bosh.tokyo
         - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
