@@ -89,10 +89,10 @@ spec:
           value: "/wp-login.php"
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__FILTERS_0__NAME
           value: Teapot
-        - name: BPL_THREAD_COUNT
+        - name: BPL_JVM_THREAD_COUNT
           value: "36"
         - name: JAVA_OPTS
-          value: " -XX:ReservedCodeCacheSize=32M -Xss512k -XX:+PrintCodeCache"
+          value: " -XX:ReservedCodeCacheSize=32M -Xss512k -XX:+PrintCodeCache -Duser.timezone=Asia/Tokyo"
         - name: SPRING_SLEUTH_SAMPLER_RATE
           value: "30"
         - name: SPRING_ZIPKIN_BASE_URL

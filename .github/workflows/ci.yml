@@ -40,8 +40,8 @@ jobs:
         rm -f pack-*.tgz
         ./pack build making/kubernetes-spring-cloud-gateway \
           -p target/gateway-*.jar  \
-          --builder gcr.io/paketo-buildpacks/builder:base \
-          --publish
+          --builder gcr.io/paketo-buildpacks/builder:base
+        docker push making/kubernetes-spring-cloud-gateway
     - uses: azure/k8s-set-context@v1
       if: github.ref == 'refs/heads/master'
       with:
