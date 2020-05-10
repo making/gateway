@@ -112,8 +112,9 @@ public class RequestLog {
 
 	@Override
 	public String toString() {
-		return "date:" + this.date + "\tmethod:" + this.method + "\tpath:" + this.path
-				+ "\tstatus:" + this.status + "\thost:" + this.host + "\taddress:"
+		return "date:" + this.date + "\thost:" + this.host
+				+ "\tmethod:" + this.method + "\tpath:" + this.path
+				+ "\tstatus:" + this.status +  "\taddress:"
 				+ this.address + "\telapsed:" + this.elapsed + "ms\tcrawler:"
 				+ this.crawler + "\tuser-agent:" + this.userAgent + "\treferer:"
 				+ this.referer;
