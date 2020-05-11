@@ -77,6 +77,8 @@ spec:
           value: kubernetes
         - name: SPRING_CLOUD_GATEWAY_HTTPCLIENT_SSL_USEINSECURETRUSTMANAGER
           value: "true"
+        - name: SPRING_CLOUD_GATEWAY_HTTPCLIENT_WEBSOCKET_MAX_FRAME_PAYLOAD_LENGTH
+          value: "655350"
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__ID
           value: banned
         - name: SPRING_CLOUD_GATEWAY_ROUTES_0__URI
