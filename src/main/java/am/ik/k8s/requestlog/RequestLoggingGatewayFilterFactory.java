@@ -82,7 +82,9 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
                             final String xForwardedProto = headers.getFirst("X-Forwarded-Proto");
                             final Span span = this.tracer.currentSpan();
                             span.tag("host", host);
-                            span.tag("referer", referer);
+                            if (referer != null) {
+                                span.tag("referer", referer);
+                            }
                             span.tag("user-agent", userAgent);
                             span.tag("crawler", String.valueOf(crawler));
                             log.info("{}", requestLog.goRouterCompliant(xForwardedFor, xForwardedProto, span));
