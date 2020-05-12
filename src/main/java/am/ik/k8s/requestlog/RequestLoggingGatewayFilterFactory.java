@@ -1,5 +1,6 @@
 package am.ik.k8s.requestlog;
 
+import brave.Span;
 import brave.Tracer;
 import is.tagomor.woothee.Classifier;
 import org.slf4j.Logger;
@@ -79,7 +80,12 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
                             final List<String> xForwardedFors = headers.get("X-Forwarded-For");
                             final String xForwardedFor = xForwardedFors == null ? null : String.join(", ", xForwardedFors);
                             final String xForwardedProto = headers.getFirst("X-Forwarded-Proto");
-                            log.info("{}", requestLog.goRouterCompliant(xForwardedFor, xForwardedProto, this.tracer.currentSpan()));
+                            final Span span = this.tracer.currentSpan();
+                            span.tag("host", host);
+                            span.tag("referer", referer);
+                            span.tag("user-agent", userAgent);
+                            span.tag("crawler", String.valueOf(crawler));
+                            log.info("{}", requestLog.goRouterCompliant(xForwardedFor, xForwardedProto, span));
                         }
                     });
         }
