@@ -1,5 +1,6 @@
 package am.ik.k8s.requestlog;
 
+import brave.Tracer;
 import is.tagomor.woothee.Classifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,19 +18,31 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import static org.springframework.http.HttpHeaders.REFERER;
 
 @Component
 public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
+    private final Tracer tracer;
+
+    public RequestLoggingGatewayFilterFactory(Tracer tracer) {
+        this.tracer = tracer;
+    }
+
     @Override
     public GatewayFilter apply(Object config) {
-        return new RequestLoggingGatewayFilter();
+        return new RequestLoggingGatewayFilter(tracer);
     }
 
     static class RequestLoggingGatewayFilter implements GatewayFilter {
         private final Logger log = LoggerFactory.getLogger("RTR");
+        private final Tracer tracer;
+
+        RequestLoggingGatewayFilter(Tracer tracer) {
+            this.tracer = tracer;
+        }
 
         @Override
         public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -62,7 +75,11 @@ public class RequestLoggingGatewayFilterFactory extends AbstractGatewayFilterFac
                                     .setHost(host).setAddress(address).setElapsed(elapsed)
                                     .setUserAgent(userAgent).setReferer(referer)
                                     .setCrawler(crawler).createRequestLog();
-                            log.info("{}", requestLog);
+                            // log.info("{}", requestLog);
+                            final List<String> xForwardedFors = headers.get("X-Forwarded-For");
+                            final String xForwardedFor = xForwardedFors == null ? null : String.join(", ", xForwardedFors);
+                            final String xForwardedProto = headers.getFirst("X-Forwarded-Proto");
+                            log.info("{}", requestLog.goRouterCompliant(xForwardedFor, xForwardedProto, this.tracer.currentSpan()));
                         }
                     });
         }
