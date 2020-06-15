@@ -138,7 +138,7 @@ spec:
             memory: "300Mi"
         readinessProbe:
           httpGet:
-            path: /management/health
+            path: /management/health/readiness
             port: 8080
             scheme: HTTPS
           initialDelaySeconds: 15
@@ -147,7 +147,7 @@ spec:
           failureThreshold: 3
         livenessProbe:
           httpGet:
-            path: /management/info
+            path: /management/health/liveness
             port: 8080
             scheme: HTTPS
           initialDelaySeconds: 180
